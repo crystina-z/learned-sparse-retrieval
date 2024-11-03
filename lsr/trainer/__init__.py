@@ -52,7 +52,7 @@ class HFTrainer(transformers.trainer.Trainer):
         if os.path.join(checkpoint, LOSS_NAME):
             self.loss.load_state_dict(torch.load(os.path.join(checkpoint, LOSS_NAME)))
 
-    def compute_loss(self, model, inputs, return_outputs=False):
+    def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
         """
         Compute loss
         """

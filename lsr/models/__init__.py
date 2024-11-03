@@ -124,6 +124,10 @@ from .mlm import (
     TransformerMLMSparseEncoder,
     TransformerMLMConfig,
 )
+from .sg_mlm import (
+    SGOutputTransformerMLMSparseEncoder,
+    SGOutputTransformerMLMConfig
+)
 from .cls_mlm import TransformerCLSMLPSparseEncoder, TransformerCLSMLMConfig
 
 AutoConfig.register("BINARY", BinaryEncoderConfig)
@@ -134,3 +138,5 @@ AutoConfig.register("MLM", TransformerMLMConfig)
 AutoModel.register(TransformerMLMConfig, TransformerMLMSparseEncoder)
 AutoConfig.register("CLS_MLM", TransformerCLSMLMConfig)
 AutoModel.register(TransformerCLSMLMConfig, TransformerCLSMLPSparseEncoder)
+AutoConfig.register("SG_MLM", SGOutputTransformerMLMConfig)
+AutoModel.register(SGOutputTransformerMLMConfig, SGOutputTransformerMLMSparseEncoder)
