@@ -29,13 +29,30 @@ def read_collection(collection_path: str, text_fields=["text"]):
             text = " ".join(texts)
             doc_dict[doc_id] = text
     elif collection_path.startswith(HFG_PREFIX):
-        hfg_name = collection_path.replace(HFG_PREFIX, "")
-        dataset = load_dataset(hfg_name)
-        for row in tqdm(
-            dataset["passage"],
-            desc=f"Loading data from HuggingFace datasets: {hfg_name}",
-        ):
-            doc_dict[row["id"]] = row["text"]
+        hfg_name = collection_path.replace(HFG_PREFIX, "").split(":")
+        if len(hfg_name) == 1:
+            dataset = load_dataset(hfg_name)
+        elif len(hfg_name) == 2:
+            hfg_name, hfg_config = hfg_name
+            dataset = load_dataset(hfg_name, hfg_config)
+        dataset = getattr(dataset, "passage", dataset["train"])
+
+        if "positive_passages" in dataset[0]:  # load from huggingface training data
+            for row in tqdm(
+                dataset,
+                desc=f"Loading data from HuggingFace datasets: {hfg_name}",
+            ):
+                for pos in row["positive_passages"]:
+                    doc_dict[pos["docid"]] = pos["text"]
+                for neg in row["negative_passages"]:
+                    doc_dict[neg["docid"]] = neg["text"]
+        else:
+            for row in tqdm(
+                dataset,
+                desc=f"Loading data from HuggingFace datasets: {hfg_name}",
+            ):
+                _id = row["id"] if "id" in row else row["docid"]
+                doc_dict[_id] = row["text"]
     else:
         with open(collection_path, "r") as f:
             for line in tqdm(f, desc=f"Reading doc collection from {collection_path}"):
@@ -57,6 +74,22 @@ def read_queries(queries_path: str, text_fields=["text"]):
             texts = [getattr(query, field) for field in text_fields]
             text = " ".join(texts)
             queries.append((query_id, text))
+    elif queries_path.startswith(HFG_PREFIX):
+        hfg_name = queries_path.replace(HFG_PREFIX, "").split(":")
+        if len(hfg_name) == 1:
+            hfg_name = hfg_name[0]
+            dataset = load_dataset(hfg_name)
+        elif len(hfg_name) == 2:
+            hfg_name, hfg_config = hfg_name
+            dataset = load_dataset(hfg_name, hfg_config)
+        else:
+            raise ValueError(f"Invalid HuggingFace dataset path: {queries_path}")
+
+        for row in tqdm(
+            dataset["train"],
+            desc=f"Loading data from HuggingFace datasets: {queries_path}",
+        ):
+            queries.append((row["query_id"], row["query"]))
     else:
         with open(queries_path, "r") as f:
             for line in tqdm(f, desc=f"Reading queries from {queries_path}"):
@@ -116,6 +149,28 @@ def read_triplets(triplet_path: str):
             triplets.append((qid, pos_id, neg_id))
             query2pos[qid].append(pos_id)
             query2neg[qid].append(neg_id)
+
+    elif triplet_path.startswith(HFG_PREFIX):
+        hfg_name = triplet_path.replace(HFG_PREFIX, "").split(":")
+        if len(hfg_name) == 1:
+            dataset = load_dataset(hfg_name)
+        elif len(hfg_name) == 2:
+            hfg_name, hfg_config = hfg_name
+            dataset = load_dataset(hfg_name, hfg_config)
+        else:
+            raise ValueError(f"Invalid HuggingFace dataset path: {triplet_path}")
+
+        for row in tqdm(
+            dataset["train"],
+            desc=f"Loading data from HuggingFace datasets: {triplet_path}",
+        ):
+            qid = row["query_id"]
+            for pos in row["positive_passages"]:
+                query2pos[qid].extend([pos["docid"]])
+                # import pdb ; pdb.set_trace()
+            for neg in row["negative_passages"]:
+                query2neg[qid].extend([neg["docid"]])
+
     else:
         with open(triplet_path) as f:
             for line in tqdm(f, desc=f"Reading triplets from {triplet_path}"):
