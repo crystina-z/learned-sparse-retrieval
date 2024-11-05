@@ -1,0 +1,6 @@
+_target_: lsr.datasets.MultipleNegatives
+# collection_path: 'hfds:castorini/mr-tydi-corpus:english'
+collection_path: 'hfds:crystina-z/xor-tydi:targetQ'
+queries_path: 'hfds:crystina-z/xor-tydi:targetQ'
+triplet_ids_path: 'hfds:crystina-z/xor-tydi:targetQ'
+train_group_size: 2

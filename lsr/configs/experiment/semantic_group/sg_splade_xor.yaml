@@ -1,0 +1,21 @@
+# @package _global_
+defaults:
+  - override /dataset@train_dataset: xortydi
+  - override /loss: multiple_negative_loss
+  - override /model: sg_splade
+
+exp_name: sg_splade_xor_0.1_0.08
+
+training_arguments:
+  max_steps: 10000
+  logging_steps: 50
+
+loss:
+  q_regularizer: 
+    _target_: lsr.losses.regularizer.FLOPs
+    weight: 0.1
+    T: 50000
+  d_regularizer:
+    _target_: lsr.losses.regularizer.FLOPs
+    weight: 0.08
+    T: 50000
