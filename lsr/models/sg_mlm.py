@@ -6,6 +6,7 @@ from lsr.utils.functional import FunctionalFactory
 from lsr.utils.pooling import PoolingFactory
 from lsr.utils.sparse_rep import SparseRep
 from transformers import AutoModelForMaskedLM
+from pprint import pprint
 
 import torch
 from torch import nn
@@ -44,11 +45,16 @@ class SGOutputEmbeddingsBertLMPredictionHead(BertLMPredictionHead):
 
         output_vocab_size= config.output_vocab_size
 
-        self.decoder = nn.Linear(config.hidden_size, output_vocab_size, bias=False)
-        self.bias = nn.Parameter(torch.zeros(output_vocab_size))
+        # self.decoder = nn.Linear(config.hidden_size, output_vocab_size, bias=False)
+        self.decoder = nn.Linear(config.hidden_size, output_vocab_size, bias=True)
+        # self.bias = nn.Parameter(torch.zeros(output_vocab_size))
 
         # Need a link between the two variables so that the bias is correctly resized with `resize_token_embeddings`
-        self.decoder.bias = self.bias
+        # self.decoder.bias = self.bias
+
+    def _tie_weights(self):
+        # self.decoder.bias = self.bias
+        pass
 
     def forward(self, hidden_states):
         hidden_states = self.transform(hidden_states)
@@ -102,6 +108,7 @@ class SGOutputTransformerMLMSparseEncoder(TransformerMLMSparseEncoder):
     def __init__(self, config: SGOutputTransformerMLMConfig = SGOutputTransformerMLMConfig()):
         super(SparseEncoder, self).__init__(config)
         assert "xlm" not in config.tf_base_model_name_or_dir, "XLM is not supported in this version"
+        pprint(config)
 
         self.model = BertSGOutputEmbeddingsForMaskedLM.from_pretrained(
             config.tf_base_model_name_or_dir
