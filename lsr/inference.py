@@ -12,10 +12,13 @@ from omegaconf import DictConfig, OmegaConf
 import wandb
 import time
 import datetime
+import datasets
 import logging
 import ir_datasets
 
 logger = logging.getLogger(__name__)
+
+HFG_FORMAT = "hfds"
 
 
 def write_to_file(f, result, type):
@@ -24,7 +27,7 @@ def write_to_file(f, result, type):
     #     if len(rep_text) > 0:
     #         f.write(f"{result['id']}\t{rep_text}\n")
     # else:
-    f.write(json.dumps(result) + "\n")
+    f.write(json.dumps(result) + "\n") 
 
 
 @hydra.main(version_base="1.2", config_path="configs", config_name="config")
@@ -40,6 +43,7 @@ def inference(cfg: DictConfig,):
     cfg = cfg.inference_arguments
     Path(cfg.output_dir).mkdir(parents=True, exist_ok=True)
     output_path = Path(cfg.output_dir).joinpath(cfg.output_file)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
     file_writer = open(output_path, "w")
     device = "cuda" if torch.cuda.is_available() else "cpu"
     logger.log(msg=f"Running inference on {device}", level=1)
@@ -72,6 +76,30 @@ def inference(cfg: DictConfig,):
                         text = line["text"].strip()
                     ids.append(idx)
                     texts.append(text)
+    elif cfg.input_format == HFG_FORMAT:
+        dataset_name = cfg.input_path
+        if ":" in dataset_name:
+            dataset_name, config = cfg.input_path.split(":")
+            dataset = datasets.load_dataset(dataset_name, config)
+        else:
+            dataset_name = cfg.input_path
+            dataset = datasets.load_dataset(dataset_name)
+
+        if cfg.type == "query":
+            dataset = dataset["dev"]
+            for entry in tqdm(dataset, desc=f"Reading data from HuggingFace datasets: {dataset_name}"):
+                idx = entry["query_id"]
+                text = entry["query"].strip()
+                ids.append(idx)
+                texts.append(text)
+        else:
+            dataset = dataset["train"]
+            for entry in tqdm(dataset, desc=f"Reading data from HuggingFace datasets: {dataset_name}"):
+                idx = entry["docid"]
+                text = entry["text"].strip()
+                ids.append(idx)
+                texts.append(text)
+
     else:
         dataset = ir_datasets.load(cfg.input_path)
         if cfg.type == "query":
@@ -91,7 +119,7 @@ def inference(cfg: DictConfig,):
                 texts.append(text)
     assert len(ids) == len(texts)
     all_token_ids = list(range(tokenizer.get_vocab_size()))
-    all_tokens = np.array(tokenizer.convert_ids_to_tokens(all_token_ids))
+    # all_tokens = np.array(tokenizer.convert_ids_to_tokens(all_token_ids))
     for idx in tqdm(range(0, len(ids), cfg.batch_size)):
         logger.log(msg={"batch": idx}, level=1)
         batch_texts = texts[idx: idx + cfg.batch_size]
@@ -123,9 +151,11 @@ def inference(cfg: DictConfig,):
             batch_values = top_k_res.values
             # (top_k_res.values * cfg.scale_factor).to(torch.int)
             indices = top_k_res.indices
-            batch_tokens = all_tokens[indices]
+            # batch_tokens = all_tokens[indices]
+            batch_token_ids = all_token_ids[indices]
             for text_id, text, tokens, weights in zip(
-                batch_ids, batch_texts, batch_tokens, batch_values
+                # batch_ids, batch_texts, batch_tokens, batch_values
+                batch_ids, batch_texts, batch_token_ids, batch_values
             ):
                 mask = weights > 0
                 tokens = tokens[mask]
@@ -146,7 +176,8 @@ def inference(cfg: DictConfig,):
             batch_weights = [[] for _ in range(len(batch_ids))]
             for row_col in batch_output.nonzero():
                 row, col = row_col
-                batch_tokens[row].append(all_tokens[col].item())
+                batch_tokens[row].append(all_token_ids[col])
+                # batch_tokens[row].append(all_tokens[col].item())
                 batch_weights[row].append(batch_output[row, col].item())
             for text_id, text, tokens, weights in zip(
                 batch_ids, batch_texts, batch_tokens, batch_weights
