@@ -1,0 +1,26 @@
+# @package _global_
+defaults:
+  - override /dataset@train_dataset: msmarco_multiple_negative
+  - override /loss: multiple_negative_loss
+  - override /model: sg_splade
+
+exp_name: sg_splade_msmarco_0.1_0.08
+
+training_arguments:
+  per_device_train_batch_size: 128
+  dataloader_num_workers: 32
+  max_steps: 10000
+  logging_steps: 50
+  fp16: False
+  bf16: True
+
+
+loss:
+  q_regularizer: 
+    _target_: lsr.losses.regularizer.FLOPs
+    weight: 0.1
+    T: 50000
+  d_regularizer:
+    _target_: lsr.losses.regularizer.FLOPs
+    weight: 0.08
+    T: 50000
