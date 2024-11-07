@@ -22,12 +22,15 @@ HFG_FORMAT = "hfds"
 
 
 def write_to_file(f, result, type):
-    # if type == "query":
-    #     rep_text = " ".join(Counter(result["vector"]).elements()).strip()
-    #     if len(rep_text) > 0:
-    #         f.write(f"{result['id']}\t{rep_text}\n")
-    # else:
-    f.write(json.dumps(result) + "\n") 
+    vectors = result["vector"]
+    vectors = {str(k): v for k, v in vectors.items()} 
+
+    if type == "query":
+        rep_text = " ".join(Counter(vectors).elements()).strip()
+        if len(rep_text) > 0:
+            f.write(f"{result['qid']}\t{rep_text}\n")
+    else:
+        f.write(json.dumps(result, ensure_ascii=False) + "\n") 
 
 
 @hydra.main(version_base="1.2", config_path="configs", config_name="config")
@@ -145,11 +148,15 @@ def inference(cfg: DictConfig,):
                 else:
                     batch_output = model.encode_docs(**batch_tkn).to("cpu")
         batch_output = batch_output.float()
+
+        id_key = "qid" if cfg.type == "query" else "id"
         if cfg.top_k > 0:
             # do top_k selection in batch
             top_k_res = batch_output.topk(dim=1, k=cfg.top_k, sorted=False)
             batch_values = top_k_res.values
-            # (top_k_res.values * cfg.scale_factor).to(torch.int)
+            if cfg.type == "query":
+                batch_values = (top_k_res.values * cfg.scale_factor).to(torch.int)
+
             indices = top_k_res.indices
             # batch_tokens = all_tokens[indices]
             batch_token_ids = all_token_ids[indices]
@@ -163,7 +170,7 @@ def inference(cfg: DictConfig,):
                 write_to_file(
                     file_writer,
                     {
-                        "id": text_id,
+                        id_key: text_id,
                         "text": text,
                         "vector": dict(zip(tokens.tolist(), weights.tolist())),
                     },
@@ -171,6 +178,9 @@ def inference(cfg: DictConfig,):
                 )
         else:
             # do non-zero selection
+            if cfg.type == "query":
+                batch_output = (batch_output * cfg.scale_factor).to(torch.int)
+
             # batch_output = (batch_output * cfg.scale_factor).to(torch.int)
             batch_tokens = [[] for _ in range(len(batch_ids))]
             batch_weights = [[] for _ in range(len(batch_ids))]
@@ -184,8 +194,9 @@ def inference(cfg: DictConfig,):
             ):
                 write_to_file(
                     file_writer,
-                    {"id": text_id, "text": text,
-                        "vector": dict(zip(tokens, weights))},
+                    {id_key: text_id,
+                     "text": text,
+                     "vector": dict(zip(tokens, weights))},
                     cfg.type,
                 )
 
