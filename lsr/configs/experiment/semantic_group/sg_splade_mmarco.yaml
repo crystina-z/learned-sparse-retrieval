@@ -1,13 +1,10 @@
 # @package _global_
 defaults:
-  - override /dataset@train_dataset: xortydi
+  - override /dataset@train_dataset: mmarco_cross_lingual
   - override /loss: multiple_negative_loss
   - override /model: sg_splade
 
-exp_name: sg_splade_xor_0.1_0.08.lr-2e-5
-
-query_max_length: 64 
-doc_max_length: 256
+exp_name: sg_splade_mmarco_0.1_0.08
 
 training_arguments:
   learning_rate: 2e-5
@@ -18,11 +15,10 @@ training_arguments:
   fp16: False
   bf16: True
 
+
 inference_arguments:
-  dataloader_num_workers: 16
   fp16: False
   bf16: True
-
 
 loss:
   q_regularizer: 
