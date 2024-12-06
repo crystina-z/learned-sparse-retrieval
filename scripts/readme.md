@@ -16,7 +16,8 @@
 **Experiments**
 
 *reproduce*
-- FILE NAME: `concise-SPLADE/aligned.Compress-0.05-cos` 
+- config: `semantic_group/sg_splade_xor.yaml`
+- model: `concise-SPLADE/aligned.Compress-0.05-cos` 
 
 *smaller compression ratio*
 The following models are available, we can proceed until the results is visibly worse: 

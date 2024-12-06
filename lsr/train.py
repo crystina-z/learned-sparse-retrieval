@@ -24,6 +24,7 @@ def train(conf: DictConfig):
     )
     logger.info(f"Working directiory: {os.getcwd()}")
     trainer = instantiate(conf.trainer)
+    # import pdb; pdb.set_trace()
     trainer.train(conf.resume_from_checkpoint)
     trainer.save_model()
     wandb.finish()
