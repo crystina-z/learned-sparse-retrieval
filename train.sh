@@ -25,8 +25,6 @@ export HF_TOKEN=$hf_key
 echo $WANDB_API_KEY
 echo $HF_TOKEN
 
-exit
-
 
 # test compressed
 python -m lsr.train +experiment=$experiment \
