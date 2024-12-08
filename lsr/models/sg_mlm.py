@@ -114,7 +114,7 @@ class SGOutputTransformerMLMSparseEncoder(TransformerMLMSparseEncoder):
         hf_token = os.getenv("HF_TOKEN", None)
         kwargs = {}
         if hf_token is not None:
-            kwargs["use_auth_token"] = hf_token
+            kwargs["token"] = hf_token
 
         self.model = BertSGOutputEmbeddingsForMaskedLM.from_pretrained(
             config.tf_base_model_name_or_dir, **kwargs
