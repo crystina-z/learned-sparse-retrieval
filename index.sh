@@ -10,14 +10,17 @@ if [ ! -d "$model_path" ]; then
 fi
 
 
+# -input $model_path/inference/doc/encoded-data/xor-tydi  \
+./outputs/sg_splade_xor_0.1_0.08.lr-2e-5/inference/doc/xor-tydi/corpus/
+
 index_path=$model_path/inference/index/xor-tydi
 if [ ! -d "$index_path" ]; then
     ./anserini-lsr/target/appassembler/bin/IndexCollection \
     -collection JsonSparseVectorCollection \
-    -input $model_path/inference/doc/encoded-data/xor-tydi  \
+    -input $model_path/inference/doc/xor-tydi  \
     -index $index_path \
     -generator SparseVectorDocumentGenerator \
-    -threads 60 -impact -pretokenized
+    -threads 20 -impact -pretokenized
 fi
 
 
