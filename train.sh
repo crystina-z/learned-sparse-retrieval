@@ -22,6 +22,8 @@ hf_key=$( cat local.sh | tail -n 1)
 export WANDB_API_KEY=$wandb_key
 export HF_TOKEN=$hf_key
 
+export HYDRA_FULL_ERROR=1
+
 # test compressed
 python -m lsr.train +experiment=$experiment \
     training_arguments.dataloader_num_workers=32 \
