@@ -16,12 +16,12 @@ training_arguments:
   max_steps: 10000
   logging_steps: 50
   fp16: False
-  bf16: True
+  bf16: False
 
 inference_arguments:
   dataloader_num_workers: 16
   fp16: False
-  bf16: True
+  bf16: False
 
 
 loss:

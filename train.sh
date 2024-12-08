@@ -14,7 +14,12 @@ bs=64
 
 
 # export CUDA_VISIBLE_DEVICES=1,2
-export CUDA_VISIBLE_DEVICES=0,1
+# export CUDA_VISIBLE_DEVICES=0,1
+
+key=$( cat local.sh )
+
+export WANDB_API_KEY=$key
+
 
 # test compressed
 python -m lsr.train +experiment=$experiment \
