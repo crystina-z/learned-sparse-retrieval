@@ -16,9 +16,16 @@ bs=64
 # export CUDA_VISIBLE_DEVICES=1,2
 # export CUDA_VISIBLE_DEVICES=0,1
 
-key=$( cat local.sh )
+wandb_key=$( cat local.sh | head -n 1)
+hf_key=$( cat local.sh | tail -n 1)
 
-export WANDB_API_KEY=$key
+export WANDB_API_KEY=$wandb_key
+export HF_TOKEN=$hf_key
+
+echo $WANDB_API_KEY
+echo $HF_TOKEN
+
+exit
 
 
 # test compressed
