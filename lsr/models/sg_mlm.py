@@ -1,5 +1,5 @@
+import os
 import logging
-
 from lsr.models.sparse_encoder import SparseEncoder
 from lsr.utils import functional
 from lsr.utils.functional import FunctionalFactory
@@ -110,8 +110,14 @@ class SGOutputTransformerMLMSparseEncoder(TransformerMLMSparseEncoder):
         assert "xlm" not in config.tf_base_model_name_or_dir, "XLM is not supported in this version"
         pprint(config)
 
+        
+        hf_token = os.getenv("HF_TOKEN", None)
+        kwargs = {}
+        if hf_token is not None:
+            kwargs["use_auth_token"] = hf_token
+
         self.model = BertSGOutputEmbeddingsForMaskedLM.from_pretrained(
-            config.tf_base_model_name_or_dir
+            config.tf_base_model_name_or_dir, **kwargs
         )
         self.activation = FunctionalFactory.get(config.activation)
         self.pool = PoolingFactory.get(config.pool)
