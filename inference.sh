@@ -35,8 +35,7 @@ fi
 
 input_path=castorini/mr-tydi-corpus:english
 output_file_name=$output_dir/corpus/full_collection.tsv
-log_dir=$output_dir/logs
-mkdir -p $(dirname $output_file_name)
+log_dir=logs/$output_dir
 mkdir -p $log_dir
 batch_size=512 
 type='doc'
@@ -44,7 +43,7 @@ type='doc'
 
 for i in $(seq -f "%02g" 0 7)
 do
-    nohup bash $_file_dir/_encode.sh $experiment $output_dir > $log_dir/nohup_encode_${i}.out 2>&1 &
+    nohup bash _inference.sh $experiment $output_dir $i > $log_dir/nohup_inference_${i}.out 2>&1 &
 
     # CUDA_VISIBLE_DEVICES=$i \
     # python -m lsr.inference \
