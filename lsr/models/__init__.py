@@ -102,19 +102,19 @@ class DualSparseEncoder(PreTrainedModel):
             self.doc_encoder.save_pretrained(model_dir + "/doc_encoder")
 
     @classmethod
-    def from_pretrained(cls, model_dir_or_name):
+    def from_pretrained(cls, model_dir_or_name, **kwargs):
         """Load query and doc encoder from a directory"""
         config = DualSparseConfig.from_pretrained(model_dir_or_name)
         if config.shared:
             shared_encoder = AutoModel.from_pretrained(
-                model_dir_or_name + "/shared_encoder"
+                model_dir_or_name + "/shared_encoder", **kwargs
             )
             return cls(shared_encoder, config=config)
         else:
             query_encoder = AutoModel.from_pretrained(
-                model_dir_or_name + "/query_encoder"
+                model_dir_or_name + "/query_encoder", **kwargs
             )
-            doc_encoder = AutoModel.from_pretrained(model_dir_or_name + "/doc_encoder")
+            doc_encoder = AutoModel.from_pretrained(model_dir_or_name + "/doc_encoder", **kwargs)
             return cls(query_encoder, doc_encoder, config)
 
 

@@ -52,6 +52,13 @@ def inference(cfg: DictConfig,):
     logger.log(msg=f"Running inference on {device}", level=1)
     logger.log(msg=f"Loading model from {cfg.model_path}", level=1)
 
+    if cfg.model.shared:
+        cfg.model_path = os.path.join(cfg.model_path, "shared_encoder")
+    else:
+        cfg.model_path = os.path.join(cfg.model_path, "query_encoder")
+
+    from pprint import pprint
+    pprint(cfg)
     hf_token = os.getenv("HF_TOKEN", None)
     kwargs = {}
     if hf_token is not None:
