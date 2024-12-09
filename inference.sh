@@ -35,19 +35,28 @@ fi
 
 input_path=castorini/mr-tydi-corpus:english
 output_file_name=$output_dir/corpus/full_collection.tsv
+log_dir=$output_dir/logs
 mkdir -p $(dirname $output_file_name)
+mkdir -p $log_dir
 batch_size=512 
 type='doc'
 
-CUDA_VISIBLE_DEVICES=0 \
-python -m lsr.inference \
-    inference_arguments.input_path=$input_path \
-    inference_arguments.output_file=$output_file_name \
-    inference_arguments.input_format=$input_format \
-    inference_arguments.type=$type \
-    inference_arguments.batch_size=$batch_size \
-    inference_arguments.scale_factor=100 \
-    inference_arguments.top_k=-400  \
-    inference_arguments.shard_number=80 \
-    inference_arguments.shard_id=0 \
-    +experiment=$experiment
+
+for i in $(seq -f "%02g" 0 7)
+do
+    nohup bash $_file_dir/_encode.sh $experiment $output_dir > $log_dir/nohup_encode_${i}.out 2>&1 &
+
+    # CUDA_VISIBLE_DEVICES=$i \
+    # python -m lsr.inference \
+    #     inference_arguments.input_path=$input_path \
+    #     inference_arguments.output_file=$output_file_name \
+    #     inference_arguments.input_format=$input_format \
+    #     inference_arguments.type=$type \
+    #     inference_arguments.batch_size=$batch_size \
+    #     inference_arguments.scale_factor=100 \
+    #     inference_arguments.top_k=-400  \
+    #     inference_arguments.shard_number=80 \
+    #     inference_arguments.shard_id=$device_id \
+    #     +experiment=$experiment
+
+done
