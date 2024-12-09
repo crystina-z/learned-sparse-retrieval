@@ -33,7 +33,7 @@ echo "Done!"
 
 input_path=castorini/mr-tydi-corpus:english
 output_file_name=$output_dir/corpus/full_collection.tsv
-log_dir=logs/$output_dir
+log_dir=logs/$output_dir/$(basename $experiment)/$(date +%Y-%m-%d-%H-%M-%S)
 mkdir -p $log_dir
 batch_size=512 
 type='doc'
