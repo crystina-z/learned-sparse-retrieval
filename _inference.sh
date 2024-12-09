@@ -36,11 +36,6 @@ do
     output_file_name=$output_dir/corpus/shard_${cur_shard}.tsv
     mkdir -p $(dirname $output_file_name)
 
-    if [ -f $output_file_name ]; then
-        echo "Skipping $output_file_name, already exists"
-        continue
-    fi
-
     echo "CUDA_VISIBLE_DEVICES=$device_id \
     python -m lsr.inference \
         inference_arguments.input_path=$input_path \
