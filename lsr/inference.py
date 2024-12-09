@@ -91,10 +91,10 @@ def inference(cfg: DictConfig,):
         dataset_name = cfg.input_path
         if ":" in dataset_name:
             dataset_name, config = cfg.input_path.split(":")
-            dataset = datasets.load_dataset(dataset_name, config)
+            dataset = datasets.load_dataset(dataset_name, config, use_auth_token=True)
         else:
             dataset_name = cfg.input_path
-            dataset = datasets.load_dataset(dataset_name)
+            dataset = datasets.load_dataset(dataset_name, use_auth_token=True)
 
         if cfg.type == "query":
             dataset = dataset["dev"]

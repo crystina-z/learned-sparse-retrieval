@@ -31,10 +31,10 @@ def read_collection(collection_path: str, text_fields=["text"]):
     elif collection_path.startswith(HFG_PREFIX):
         hfg_name = collection_path.replace(HFG_PREFIX, "").split(":")
         if len(hfg_name) == 1:
-            dataset = load_dataset(hfg_name)
+            dataset = load_dataset(hfg_name, use_auth_token=True)
         elif len(hfg_name) == 2:
             hfg_name, hfg_config = hfg_name
-            dataset = load_dataset(hfg_name, hfg_config)
+            dataset = load_dataset(hfg_name, hfg_config, use_auth_token=True)
         dataset = getattr(dataset, "passage", dataset["train"])
 
         if "positive_passages" in dataset[0]:  # load from huggingface training data
@@ -78,10 +78,10 @@ def read_queries(queries_path: str, text_fields=["text"]):
         hfg_name = queries_path.replace(HFG_PREFIX, "").split(":")
         if len(hfg_name) == 1:
             hfg_name = hfg_name[0]
-            dataset = load_dataset(hfg_name)
+            dataset = load_dataset(hfg_name, use_auth_token=True)
         elif len(hfg_name) == 2:
             hfg_name, hfg_config = hfg_name
-            dataset = load_dataset(hfg_name, hfg_config)
+            dataset = load_dataset(hfg_name, hfg_config, use_auth_token=True)
         else:
             raise ValueError(f"Invalid HuggingFace dataset path: {queries_path}")
 
@@ -153,10 +153,10 @@ def read_triplets(triplet_path: str):
     elif triplet_path.startswith(HFG_PREFIX):
         hfg_name = triplet_path.replace(HFG_PREFIX, "").split(":")
         if len(hfg_name) == 1:
-            dataset = load_dataset(hfg_name)
+            dataset = load_dataset(hfg_name, use_auth_token=True)
         elif len(hfg_name) == 2:
             hfg_name, hfg_config = hfg_name
-            dataset = load_dataset(hfg_name, hfg_config)
+            dataset = load_dataset(hfg_name, hfg_config, use_auth_token=True)
         else:
             raise ValueError(f"Invalid HuggingFace dataset path: {triplet_path}")
 
