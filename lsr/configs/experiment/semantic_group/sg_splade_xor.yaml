@@ -2,9 +2,9 @@
 defaults:
   - override /dataset@train_dataset: xortydi
   - override /loss: multiple_negative_loss
-  - override /model: sg_splade
+  - override /model: sg_splade_sum
 
-exp_name: sg_splade_xor_0.1_0.08.lr-2e-5
+exp_name: sg_splade_xor_0.1_0.08.lr-2e-5.pool-sum
 
 query_max_length: 64 
 doc_max_length: 256
@@ -16,12 +16,12 @@ training_arguments:
   max_steps: 10000
   logging_steps: 50
   fp16: False
-  bf16: False
+  bf16: True 
 
 inference_arguments:
   dataloader_num_workers: 16
   fp16: False
-  bf16: False
+  bf16: True
 
 
 loss:

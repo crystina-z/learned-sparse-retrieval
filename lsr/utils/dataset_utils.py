@@ -167,7 +167,6 @@ def read_triplets(triplet_path: str):
             qid = row["query_id"]
             for pos in row["positive_passages"]:
                 query2pos[qid].extend([pos["docid"]])
-                # import pdb ; pdb.set_trace()
             for neg in row["negative_passages"]:
                 query2neg[qid].extend([neg["docid"]])
 

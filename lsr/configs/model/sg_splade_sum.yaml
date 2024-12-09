@@ -1,0 +1,11 @@
+_target_: lsr.models.DualSparseEncoder
+query_encoder:
+  _target_: lsr.models.SGOutputTransformerMLMSparseEncoder
+  config:
+    _target_: lsr.models.SGOutputTransformerMLMConfig
+    tf_base_model_name_or_dir: concise-SPLADE/aligned.Compress-0.05-cos.ms-pFT
+    pool: sum
+
+config:
+  _target_: lsr.models.DualSparseConfig
+  shared: True
