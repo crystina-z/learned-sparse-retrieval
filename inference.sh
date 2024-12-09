@@ -42,5 +42,7 @@ type='doc'
 for i in $(seq -f "%2g" 0 7)
 do
     nohup bash _inference.sh $experiment $output_dir $i > $log_dir/nohup_inference_${i}.out 2>&1 &
-
 done
+
+
+echo "Logs can be found in $log_dir"

@@ -36,7 +36,7 @@ do
     output_file_name=$output_dir/corpus/shard_${cur_shard}.tsv
     mkdir -p $(dirname $output_file_name)
 
-    echo "CUDA_VISIBLE_DEVICES=$device_id \
+    CUDA_VISIBLE_DEVICES=$device_id \
     python -m lsr.inference \
         inference_arguments.input_path=$input_path \
         inference_arguments.output_file=$output_file_name \
@@ -48,6 +48,6 @@ do
         inference_arguments.shard_number=$total_shard \
         inference_arguments.shard_id=$cur_shard \
         +experiment=$experiment
-    "
 
+    sleep 10s
 done
