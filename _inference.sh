@@ -26,12 +26,14 @@ batch_size=512
 type='doc'
 
 
-total_shard=$(( 8 * 10 ))
+# shard_size=10
+shard_size=1
+total_shard=$(( 8 * shard_size ))
 
 # each shard are additionally separated into 10 shards
-for j in $(seq 0 9)
+for j in $(seq 0 $(( shard_size - 1 )))
 do
-    cur_shard=$(( $device_id * 10 + $j ))  # i: 0-7, j: 0-9
+    cur_shard=$(( $device_id * shard_size + $j ))  # i: 0-7, j: 0-9
 
     output_file_name=$output_dir/corpus/shard_${cur_shard}.tsv
     mkdir -p $(dirname $output_file_name)
