@@ -52,10 +52,12 @@ def inference(cfg: DictConfig,):
     logger.log(msg=f"Running inference on {device}", level=1)
     logger.log(msg=f"Loading model from {cfg.model_path}", level=1)
 
-    model = DualSparseEncoder.from_pretrained(
-        cfg.model_path,
-        use_auth_token=True,
-    )
+    hf_token = os.getenv("HF_TOKEN", None)
+    kwargs = {}
+    if hf_token is not None:
+        kwargs["token"] = hf_token
+
+    model = DualSparseEncoder.from_pretrained(cfg.model_path, **kwargs)
     model.eval()
     model.to(device)
     tokenizer_path = os.path.join(cfg.model_path, "tokenizer")
