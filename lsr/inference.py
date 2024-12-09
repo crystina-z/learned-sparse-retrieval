@@ -46,6 +46,21 @@ def inference(cfg: DictConfig,):
     cfg = cfg.inference_arguments
     Path(cfg.output_dir).mkdir(parents=True, exist_ok=True)
     output_path = Path(cfg.output_dir).joinpath(cfg.output_file)
+
+    if output_path.exists():
+        if cfg.type == "doc":
+            try:
+                with open(output_path, "r") as f:
+                    json.load(f)
+
+                logger.info(msg=f"Output file {output_path} already exists, exiting", level=1)
+                exit(0)
+            except:
+                logger.warning(msg=f"Output file {output_path} exists but cannot be loaded, continue processing", level=1)
+        else:
+            logger.info(msg=f"Output file {output_path} already exists, exiting", level=1)
+            exit(0)
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
     file_writer = open(output_path, "w")
     device = "cuda" if torch.cuda.is_available() else "cpu"
