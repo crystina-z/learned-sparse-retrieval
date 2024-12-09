@@ -1,5 +1,12 @@
 set -e
 
+wandb_key=$( cat local.sh | head -n 1)
+hf_key=$( cat local.sh | tail -n 1)
+
+export WANDB_API_KEY=$wandb_key
+export HF_TOKEN=$hf_key
+
+
 experiment=semantic_group/sg_splade_xor.yaml
 output_dir=xor-tydi
 mkdir -p $output_dir

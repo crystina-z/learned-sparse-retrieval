@@ -51,7 +51,11 @@ def inference(cfg: DictConfig,):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     logger.log(msg=f"Running inference on {device}", level=1)
     logger.log(msg=f"Loading model from {cfg.model_path}", level=1)
-    model = DualSparseEncoder.from_pretrained(cfg.model_path)
+
+    model = DualSparseEncoder.from_pretrained(
+        cfg.model_path,
+        use_auth_token=True,
+    )
     model.eval()
     model.to(device)
     tokenizer_path = os.path.join(cfg.model_path, "tokenizer")
