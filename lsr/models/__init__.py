@@ -105,6 +105,9 @@ class DualSparseEncoder(PreTrainedModel):
     def from_pretrained(cls, model_dir_or_name, **kwargs):
         """Load query and doc encoder from a directory"""
         config = DualSparseConfig.from_pretrained(model_dir_or_name)
+        print(">>>>>> config", config)
+        print(">>>>>> model_dir_or_name", model_dir_or_name)
+
         if config.shared:
             shared_encoder = AutoModel.from_pretrained(
                 model_dir_or_name + "/shared_encoder", **kwargs
