@@ -53,12 +53,12 @@ def inference(cfg: DictConfig,):
                 with open(output_path, "r") as f:
                     json.load(f)
 
-                logger.info(msg=f"Output file {output_path} already exists, exiting", level=1)
+                logger.info(msg=f"Output file {output_path} already exists, exiting")
                 exit(0)
             except:
-                logger.warning(msg=f"Output file {output_path} exists but cannot be loaded, continue processing", level=1)
+                logger.warning(msg=f"Output file {output_path} exists but cannot be loaded, continue processing")
         else:
-            logger.info(msg=f"Output file {output_path} already exists, exiting", level=1)
+            logger.info(msg=f"Output file {output_path} already exists, exiting")
             exit(0)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
