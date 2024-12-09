@@ -121,6 +121,31 @@ def inference(cfg: DictConfig,):
                 ids.append(idx)
                 texts.append(text)
     assert len(ids) == len(texts)
+
+    shard_number, shard_id = cfg.shard_number, cfg.shard_id
+    if shard_number > 1:
+        # check shard size > 1
+        shard_size = len(ids) // shard_number
+        if shard_size == 0:
+            shard_size = 1
+            shard_number = len(ids)
+            logger.warning(msg=f"No shard size, set to 1, shard number to {shard_number}")
+            if shard_id >= shard_number:
+                logger.log(msg=f"Shard id {shard_id} is out of range, exiting", level=1)
+                exit(0)
+
+        # process shard
+        start_idx = shard_id * shard_size
+        end_idx = min(start_idx + shard_size, len(ids))
+        ids = ids[start_idx:end_idx]
+        texts = texts[start_idx:end_idx]
+        logger.log(msg=f"Sharding data into {shard_number} shards, using shard {shard_id}; each shard has size {shard_size}", level=1)
+
+        assert len(ids) == len(texts)
+        if not ids or not texts:
+            logger.log(msg=f"No data to process, exiting", level=1)
+            exit(0)
+
     all_token_ids = list(range(tokenizer.get_vocab_size()))
     # all_tokens = np.array(tokenizer.convert_ids_to_tokens(all_token_ids))
     for idx in tqdm(range(0, len(ids), cfg.batch_size)):

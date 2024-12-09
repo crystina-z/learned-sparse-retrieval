@@ -32,7 +32,7 @@ mkdir -p $(dirname $output_file_name)
 batch_size=512 
 type='doc'
 
-CUDA_VISIBLE_DEVICES=2 \
+CUDA_VISIBLE_DEVICES=0 \
 python -m lsr.inference \
     inference_arguments.input_path=$input_path \
     inference_arguments.output_file=$output_file_name \
@@ -41,4 +41,6 @@ python -m lsr.inference \
     inference_arguments.batch_size=$batch_size \
     inference_arguments.scale_factor=100 \
     inference_arguments.top_k=-400  \
+    inference_arguments.shard_number=80 \
+    inference_arguments.shard_id=0 \
     +experiment=$experiment

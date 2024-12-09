@@ -57,6 +57,9 @@ inference_arguments:
   ngram_top_k: 200
   batch_size: 256
   scale_factor: 100
+  shard_number: 1 
+  shard_id: 0
+
 trainer: 
   _target_: lsr.trainer.HFTrainer
   model: ${model}
