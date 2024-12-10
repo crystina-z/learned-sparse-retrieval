@@ -9,6 +9,8 @@ export HF_TOKEN=$hf_key
 
 # experiment=semantic_group/sg_splade_xor.yaml
 experiment=semantic_group/sg_splade_xor_0.06_0.02.yaml
+experiment=semantic_group/test_inference.yaml
+
 output_dir=xor-tydi
 mkdir -p $output_dir
 

@@ -5,6 +5,8 @@ experiment=semantic_group/sg_splade_xor_0.06_0.02.yaml
 # experiment=semantic_group/sg_splade_msmarco.yaml
 # experiment=semantic_group/sg_splade_mmarco.yaml
 
+experiment=semantic_group/test_inference.yaml
+
 # python -m lsr.train +experiment=splade_msmarco_distil_flops_0.1_0.08.yaml \
 #     training_arguments.fp16=True \
 #     training_arguments.per_device_train_batch_size=2
