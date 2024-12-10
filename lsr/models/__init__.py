@@ -123,8 +123,6 @@ class DualSparseEncoder(PreTrainedModel):
             return cls.from_pretrained_sg(model_dir_or_name, **kwargs)
 
         config = DualSparseConfig.from_pretrained(model_dir_or_name)
-        print(">>>>>> config", config)
-        print(">>>>>> model_dir_or_name", model_dir_or_name)
 
         if config.shared:
             shared_encoder = AutoModel.from_pretrained(
@@ -146,16 +144,17 @@ class DualSparseEncoder(PreTrainedModel):
         """
         assert model_dir_or_name.startswith("sg") or "/sg" in model_dir_or_name, "model_dir_or_name must start with 'sg' or contain '/sg'"
 
+        print(">>>>>> Loading {} into SG model".format(model_dir_or_name))
+
         """Load query and doc encoder from a directory"""
         config = DualSparseConfig.from_pretrained(model_dir_or_name)
         assert config.shared, "SG models are always shared"
-        print(">>>>>> config", config)
-        print(">>>>>> model_dir_or_name", model_dir_or_name)
 
         if config.shared:
             shared_encoder = SGOutputTransformerMLMSparseEncoder.from_pretrained(
                 model_dir_or_name + "/shared_encoder", **kwargs
             )
+            print(shared_encoder)
             return cls(shared_encoder, config=config)
         else:
             raise NotImplementedError("SG models are always shared")

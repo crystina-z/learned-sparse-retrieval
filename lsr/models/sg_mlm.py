@@ -43,7 +43,7 @@ class SGOutputEmbeddingsBertLMPredictionHead(BertLMPredictionHead):
         nn.Module.__init__(self)
         self.transform = BertPredictionHeadTransform(config)
 
-        output_vocab_size= config.output_vocab_size
+        output_vocab_size = config.output_vocab_size
 
         # self.decoder = nn.Linear(config.hidden_size, output_vocab_size, bias=False)
         self.decoder = nn.Linear(config.hidden_size, output_vocab_size, bias=True)
@@ -96,6 +96,21 @@ class SGOutputTransformerMLMConfig(TransformerMLMConfig):
 
     model_type = "SG_MLM"
 
+    def __init__(
+        self,
+        output_embedding_dim: int = None,
+        **kwargs,
+    ):
+        """
+        Construct an instance of SGOutputTransformerMLMConfig
+        Paramters
+        ---------
+        output_embedding_dim: int
+            dimension of the output embedding
+        """
+        self.output_embedding_dim = output_embedding_dim
+        super().__init__(**kwargs)
+
 
 class SGOutputTransformerMLMSparseEncoder(TransformerMLMSparseEncoder):
     """
@@ -108,7 +123,7 @@ class SGOutputTransformerMLMSparseEncoder(TransformerMLMSparseEncoder):
     def __init__(self, config: SGOutputTransformerMLMConfig = SGOutputTransformerMLMConfig()):
         super(SparseEncoder, self).__init__(config)
         assert "xlm" not in config.tf_base_model_name_or_dir, "XLM is not supported in this version"
-        
+
         hf_token = os.getenv("HF_TOKEN", None)
         kwargs = {}
         if hf_token is not None:
