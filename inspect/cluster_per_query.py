@@ -6,7 +6,7 @@ import json
 import argparse
 import datasets
 
-from collections import defaultdict
+from collections import defaultdict, Counter
 
 cur_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -29,7 +29,7 @@ def yield_query_tokens(query_file):
             yield qid, token_ids 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--query_file", type=str, required=True)
+parser.add_argument("--query_file", "-q", type=str, required=True)
 args = parser.parse_args()
 
 query_file = args.query_file
@@ -40,7 +40,9 @@ id2group = load_id2group()
 
 for qid, token_ids in yield_query_tokens(query_file):
     print(qid, qid_to_text[qid])
-    for token_id in token_ids:
-        print(id2group[token_id])
+    token_ids = Counter(token_ids)
+    for token_id, count in token_ids.most_common():
+        print(f"{token_id} ({count})", end=" | ")
+        print(id2group[int(token_id)])
     # break
     import pdb ; pdb.set_trace()
