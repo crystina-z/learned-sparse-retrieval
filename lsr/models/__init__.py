@@ -3,6 +3,20 @@ from transformers import PreTrainedModel, AutoConfig, PretrainedConfig, AutoMode
 from lsr.models.sparse_encoder import SparseEncoder
 
 
+from .binary import BinaryEncoder, BinaryEncoderConfig
+from .mlp import TransformerMLPSparseEncoder, TransformerMLPConfig
+from .mlm import (
+    TransformerMLMSparseEncoder,
+    TransformerMLMConfig,
+)
+from .sg_mlm import (
+    SGOutputTransformerMLMSparseEncoder,
+    SGOutputTransformerMLMConfig
+)
+from .cls_mlm import TransformerCLSMLPSparseEncoder, TransformerCLSMLMConfig
+
+
+
 class DualSparseConfig(PretrainedConfig):
     model_type = "DualEncoder"
 
@@ -104,6 +118,10 @@ class DualSparseEncoder(PreTrainedModel):
     @classmethod
     def from_pretrained(cls, model_dir_or_name, **kwargs):
         """Load query and doc encoder from a directory"""
+
+        if model_dir_or_name.startswith("sg") or "/sg" in model_dir_or_name:
+            return cls.from_pretrained_sg(model_dir_or_name, **kwargs)
+
         config = DualSparseConfig.from_pretrained(model_dir_or_name)
         print(">>>>>> config", config)
         print(">>>>>> model_dir_or_name", model_dir_or_name)
@@ -121,17 +139,29 @@ class DualSparseEncoder(PreTrainedModel):
             return cls(query_encoder, doc_encoder, config)
 
 
-from .binary import BinaryEncoder, BinaryEncoderConfig
-from .mlp import TransformerMLPSparseEncoder, TransformerMLPConfig
-from .mlm import (
-    TransformerMLMSparseEncoder,
-    TransformerMLMConfig,
-)
-from .sg_mlm import (
-    SGOutputTransformerMLMSparseEncoder,
-    SGOutputTransformerMLMConfig
-)
-from .cls_mlm import TransformerCLSMLPSparseEncoder, TransformerCLSMLMConfig
+    @classmethod
+    def from_pretrained_sg(cls, model_dir_or_name, **kwargs):
+        """
+        from_pretrained for SG models
+        """
+        assert model_dir_or_name.startswith("sg") or "/sg" in model_dir_or_name, "model_dir_or_name must start with 'sg' or contain '/sg'"
+        assert config.shared, "SG models are always shared"
+
+        """Load query and doc encoder from a directory"""
+        config = DualSparseConfig.from_pretrained(model_dir_or_name)
+        print(">>>>>> config", config)
+        print(">>>>>> model_dir_or_name", model_dir_or_name)
+
+        if config.shared:
+            shared_encoder = SGOutputTransformerMLMSparseEncoder.from_pretrained(
+                model_dir_or_name + "/shared_encoder", **kwargs
+            )
+            return cls(shared_encoder, config=config)
+        else:
+            raise NotImplementedError("SG models are always shared")
+
+
+
 
 AutoConfig.register("BINARY", BinaryEncoderConfig)
 AutoModel.register(BinaryEncoderConfig, BinaryEncoder)
