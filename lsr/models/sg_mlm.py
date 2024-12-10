@@ -96,20 +96,6 @@ class SGOutputTransformerMLMConfig(TransformerMLMConfig):
 
     model_type = "SG_MLM"
 
-    def __init__(
-        self,
-        output_embedding_dim: int = None,
-        **kwargs,
-    ):
-        """
-        Construct an instance of SGOutputTransformerMLMConfig
-        Paramters
-        ---------
-        output_embedding_dim: int
-            dimension of the output embedding
-        """
-        self.output_embedding_dim = output_embedding_dim
-        super().__init__(**kwargs)
 
 
 class SGOutputTransformerMLMSparseEncoder(TransformerMLMSparseEncoder):
