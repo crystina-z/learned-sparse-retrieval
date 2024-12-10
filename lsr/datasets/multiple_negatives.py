@@ -26,6 +26,7 @@ class MultipleNegatives(Dataset):
         }
         self.qids = list(self.q_dict.keys())
         self.train_group_size = train_group_size
+        # checked XOR-TYDI on above: docs, q2pos or neg, q_dict
 
     def __len__(self):
         return len(self.q_dict)

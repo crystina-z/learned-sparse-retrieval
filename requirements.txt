@@ -9,3 +9,4 @@ hydra-core
 ir_datasets 
 datasets
 wandb
+nvitop
