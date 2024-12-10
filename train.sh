@@ -1,6 +1,7 @@
 # experiment=splade_msmarco_distil_flops_0.1_0.08.yaml
 experiment=semantic_group/sg_splade_msmarco_distil_flops_0.1_0.08.yaml
-experiment=semantic_group/sg_splade_xor.yaml
+# experiment=semantic_group/sg_splade_xor.yaml
+experiment=semantic_group/sg_splade_xor_0.06_0.02.yaml
 # experiment=semantic_group/sg_splade_msmarco.yaml
 # experiment=semantic_group/sg_splade_mmarco.yaml
 
@@ -13,7 +14,7 @@ experiment=semantic_group/sg_splade_xor.yaml
 bs=64
 
 
-# export CUDA_VISIBLE_DEVICES=1,2
+# export CUDA_VISIBLE_DEVICES=3
 # export CUDA_VISIBLE_DEVICES=0,1
 
 wandb_key=$( cat local.sh | head -n 1)
