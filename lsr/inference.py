@@ -46,12 +46,35 @@ def inference(cfg: DictConfig,):
     cfg = cfg.inference_arguments
     Path(cfg.output_dir).mkdir(parents=True, exist_ok=True)
     output_path = Path(cfg.output_dir).joinpath(cfg.output_file)
+
+    if output_path.exists():
+        if cfg.type == "doc":
+            try:
+                with open(output_path, "r") as f:
+                    json.load(f)
+
+                logger.info(msg=f"Output file {output_path} already exists, exiting")
+                exit(0)
+            except:
+                logger.warning(msg=f"Output file {output_path} exists but cannot be loaded, continue processing")
+        else:
+            logger.info(msg=f"Output file {output_path} already exists, exiting")
+            exit(0)
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
     file_writer = open(output_path, "w")
     device = "cuda" if torch.cuda.is_available() else "cpu"
     logger.log(msg=f"Running inference on {device}", level=1)
     logger.log(msg=f"Loading model from {cfg.model_path}", level=1)
-    model = DualSparseEncoder.from_pretrained(cfg.model_path)
+
+    from pprint import pprint
+    pprint(cfg)
+    hf_token = os.getenv("HF_TOKEN", None)
+    kwargs = {}
+    if hf_token is not None:
+        kwargs["token"] = hf_token
+
+    model = DualSparseEncoder.from_pretrained(cfg.model_path, **kwargs)
     model.eval()
     model.to(device)
     tokenizer_path = os.path.join(cfg.model_path, "tokenizer")
@@ -83,10 +106,10 @@ def inference(cfg: DictConfig,):
         dataset_name = cfg.input_path
         if ":" in dataset_name:
             dataset_name, config = cfg.input_path.split(":")
-            dataset = datasets.load_dataset(dataset_name, config)
+            dataset = datasets.load_dataset(dataset_name, config, trust_remote_code=True)
         else:
             dataset_name = cfg.input_path
-            dataset = datasets.load_dataset(dataset_name)
+            dataset = datasets.load_dataset(dataset_name, trust_remote_code=True)
 
         if cfg.type == "query":
             dataset = dataset["dev"]
@@ -121,6 +144,31 @@ def inference(cfg: DictConfig,):
                 ids.append(idx)
                 texts.append(text)
     assert len(ids) == len(texts)
+
+    shard_number, shard_id = cfg.shard_number, cfg.shard_id
+    if shard_number > 1:
+        # check shard size > 1
+        shard_size = len(ids) // shard_number
+        if shard_size == 0:
+            shard_size = 1
+            shard_number = len(ids)
+            logger.warning(msg=f"No shard size, set to 1, shard number to {shard_number}")
+            if shard_id >= shard_number:
+                logger.log(msg=f"Shard id {shard_id} is out of range, exiting", level=1)
+                exit(0)
+
+        # process shard
+        start_idx = shard_id * shard_size
+        end_idx = min(start_idx + shard_size, len(ids))
+        ids = ids[start_idx:end_idx]
+        texts = texts[start_idx:end_idx]
+        logger.log(msg=f"Sharding data into {shard_number} shards, using shard {shard_id}; each shard has size {shard_size}", level=1)
+
+        assert len(ids) == len(texts)
+        if not ids or not texts:
+            logger.log(msg=f"No data to process, exiting", level=1)
+            exit(0)
+
     all_token_ids = list(range(tokenizer.get_vocab_size()))
     # all_tokens = np.array(tokenizer.convert_ids_to_tokens(all_token_ids))
     for idx in tqdm(range(0, len(ids), cfg.batch_size)):
