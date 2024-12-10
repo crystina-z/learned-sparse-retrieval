@@ -28,8 +28,8 @@ loss:
   q_regularizer: 
     _target_: lsr.losses.regularizer.FLOPs
     weight: 0.06
-    T: 50000
+    T: 0
   d_regularizer:
     _target_: lsr.losses.regularizer.FLOPs
     weight: 0.02
-    T: 50000
+    T: 0
