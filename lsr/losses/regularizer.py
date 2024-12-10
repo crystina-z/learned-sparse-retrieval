@@ -33,6 +33,9 @@ class Regularizer(nn.Module):
         Perform a warming up step.
         The weight starts with zero and get expoentially increased step by step until the T-th step.
         """
+        if self.T <= 0:
+            self.weight_t = self.weight_T
+
         if self.t >= self.T:
             pass
         else:
