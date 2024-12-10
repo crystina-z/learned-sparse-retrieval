@@ -35,8 +35,7 @@ class Regularizer(nn.Module):
         """
         if self.T <= 0:
             self.weight_t = self.weight_T
-
-        if self.t >= self.T:
+        elif self.t >= self.T:
             pass
         else:
             self.t += 1
