@@ -118,6 +118,11 @@ class DualSparseEncoder(PreTrainedModel):
     @classmethod
     def from_pretrained(cls, model_dir_or_name, **kwargs):
         """Load query and doc encoder from a directory"""
+        
+        # DEBUG MODE!!
+        return cls.from_pretrained_debug(
+            model_dir_or_name, **kwargs
+        )
 
         config = DualSparseConfig.from_pretrained(model_dir_or_name)
 
@@ -134,6 +139,21 @@ class DualSparseEncoder(PreTrainedModel):
             return cls(query_encoder, doc_encoder, config)
 
 
+    @classmethod
+    def from_pretrained_debug(cls, model_dir_or_name, **kwargs):
+        config = DualSparseConfig.from_pretrained(model_dir_or_name)
+
+        if config.shared:
+            shared_encoder = AutoModel.from_pretrained(
+                model_dir_or_name + "/shared_encoder-old", **kwargs
+            )
+            from lsr.models.sg_mlm import BertSGOutputEmbeddingsForMaskedLM
+            shared_encoder.model = BertSGOutputEmbeddingsForMaskedLM.from_pretrained(
+                model_dir_or_name + "/shared_encoder", **kwargs
+            )
+            return cls(shared_encoder, config=config)
+        else:
+            raise ValueError("Shared encoder is not supported in debug mode")
 
 
 
