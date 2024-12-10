@@ -145,10 +145,10 @@ class DualSparseEncoder(PreTrainedModel):
         from_pretrained for SG models
         """
         assert model_dir_or_name.startswith("sg") or "/sg" in model_dir_or_name, "model_dir_or_name must start with 'sg' or contain '/sg'"
-        assert config.shared, "SG models are always shared"
 
         """Load query and doc encoder from a directory"""
         config = DualSparseConfig.from_pretrained(model_dir_or_name)
+        assert config.shared, "SG models are always shared"
         print(">>>>>> config", config)
         print(">>>>>> model_dir_or_name", model_dir_or_name)
 
