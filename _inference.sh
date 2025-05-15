@@ -22,7 +22,7 @@ fi
 
 input_format=hfds
 input_path=castorini/mr-tydi-corpus:english
-batch_size=512 
+batch_size=1024
 type='doc'
 
 

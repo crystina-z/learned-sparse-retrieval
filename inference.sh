@@ -34,13 +34,16 @@ python -m lsr.inference \
 echo "Done!"
 # exit
 
-input_path=castorini/mr-tydi-corpus:english
-output_file_name=$output_dir/corpus/full_collection.tsv
+# input_path=castorini/mr-tydi-corpus:english
+# output_file_name=$output_dir/corpus/full_collection.tsv
 log_dir=logs/$output_dir/$(basename $experiment)/$(date +%Y-%m-%d-%H-%M-%S)
 mkdir -p $log_dir
-batch_size=512 
-type='doc'
+# batch_size=512 
+# type='doc'
 
+
+bash _inference.sh $experiment $output_dir 0
+exit
 
 for i in $(seq -f "%2g" 0 7)
 do
